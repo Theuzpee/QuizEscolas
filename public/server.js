@@ -1,5 +1,5 @@
-// Servidor simples (sem dependências) – Node 16+
-// Serve o jogo e grava as tentativas em tentativas.txt (ID auto incremento).
+
+// Serve o jogo e grava as tentativas em tentativas.txt
 const http = require('http'), fs = require('fs'), path = require('path');
 const PORTA = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
@@ -27,7 +27,7 @@ http.createServer((req, res) => {
       if (corpo.length > 10000) { res.writeHead(413).end('payload muito grande'); return; }
     });
     req.on('end', () => {
-      if (res.writableEnded) return; // já encerrou por excesso de tamanho
+      if (res.writableEnded) return; 
       try {
         const t = JSON.parse(corpo), agora = new Date();
         if (!fs.existsSync(ARQ)) fs.writeFileSync(ARQ, 'ID|Nome|Data|Hora|Nivel|Area|Habilidade|Pergunta|Resultado\n');
