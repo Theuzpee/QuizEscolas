@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quiz dos Pequenos Grandes Gênios</title>
-
+  <!-- Fonte local: copie Nunito.woff2 para /fonts/ ou use o fallback abaixo -->
   <style>
     @font-face {
       font-family: 'Nunito';
@@ -559,23 +559,6 @@
     }
     .btn-voltar-inicio:hover { transform: translateY(-2px); }
 
-    .btn-baixar {
-      background: #fff;
-      color: #1a2f6e;
-      font: 700 1rem 'Nunito', 'Trebuchet MS', 'Comic Sans MS', system-ui, sans-serif;
-      border: 2px solid #1a2f6e;
-      border-radius: 50px;
-      padding: 10px 0;
-      width: 100%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background .12s;
-    }
-    .btn-baixar:hover { background: #f0f4ff; }
-
     /* ── Botão genérico azul ── */
     .btn-azul {
       background: linear-gradient(90deg, #29C6E0 0%, #1aaec8 100%);
@@ -601,8 +584,9 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
-
-    <body>
+  </style>
+</head>
+<body>
 
   <!-- ══════════════════════════════════════
        TELA 1 – INÍCIO
@@ -705,10 +689,9 @@
 
         <button class="btn-jogar-novo" id="btn-jogar-novo">🔄 Jogar Novamente</button>
         <button class="btn-voltar-inicio" id="btn-voltar-inicio">🏠 Voltar ao Início</button>
-        <button class="btn-baixar" id="btn-baixar" hidden>💾 Baixar registro (.txt)</button>
       </div>
     </div>
   </section>
 
-  </style>
-</head>
+  </body>
+</html>
