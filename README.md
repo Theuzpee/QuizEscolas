@@ -10,10 +10,8 @@ QuizEscolas/
 ├── tentativas.txt     ← gerado automaticamente ao rodar
 ├── LEIAME.md
 └── public/            ← tudo que o navegador acessa
-    ├── index.html     ← jogo completo (5 telas)
-    ├── questoes.js    ← banco de perguntas (edite aqui)
-    ├── fonts/
-    │   └── Nunito.woff2   ← fonte local (veja seção Fonte abaixo)
+    ├── index.html     ← jogo completo
+    ├── questoes.js    ← banco de perguntas 
     └── img/
         ├── bg-inicio.jpg      ← fundo: sala 3D robô azul + teclado
         ├── bg-nivel.jpg       ← fundo: mesmo da tela inicial
@@ -49,19 +47,6 @@ O servidor **não precisa de `npm install`** — não há dependências externas
 Salve os arquivos de imagem em `public/img/` com os nomes exatos listados
 na estrutura acima. Sem essas imagens o jogo funciona, mas os fundos
 e o mascote não aparecem.
-
----
-
-## Fonte local (Nunito)
-
-O jogo usa a fonte **Nunito** servida localmente para funcionar sem internet.
-
-1. Baixe o arquivo `Nunito.woff2` em: https://fonts.google.com/specimen/Nunito
-   (clique em "Download family" → extraia → pegue o arquivo `.woff2` da pasta `static/`)
-2. Salve em `public/fonts/Nunito.woff2`
-
-Se o arquivo não estiver presente, o jogo usa automaticamente
-**Trebuchet MS → Comic Sans MS → fonte do sistema** como fallback.
 
 ---
 
