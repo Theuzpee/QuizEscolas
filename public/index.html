@@ -601,5 +601,114 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
+
+    <body>
+
+  <!-- ══════════════════════════════════════
+       TELA 1 – INÍCIO
+  ══════════════════════════════════════ -->
+  <section id="inicio" class="tela on">
+    <div class="inicio-logo">
+      <img src="/img/robo-inicio.jpeg" alt="Mascote UNIFEBE">
+    </div>
+    <h1 class="inicio-titulo">Quiz dos Pequenos<br>Grandes Gênios</h1>
+    <p class="inicio-sub">Responda perguntas divertidas, ganhe estrelas e mostre que você é um gênio!</p>
+    <button class="btn-comecar" id="btn-comecar">
+      <span class="play-icon"></span> Começar
+    </button>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       TELA 2 – NOME
+  ══════════════════════════════════════ -->
+  <section id="nome-tela" class="tela">
+    <div class="card-nome">
+      <h2>Qual é o seu nome? 😊</h2>
+      <input id="nome-input" type="text" maxlength="40" placeholder="Digite seu nome" autocomplete="off" aria-label="Nome da criança">
+      <button class="btn-azul" id="btn-ir-nivel">Continuar →</button>
+      <p style="font-size:0.75rem;color:#777;text-align:center;max-width:340px;line-height:1.4;">
+        🔒 O nome informado é usado apenas para identificar as respostas nesta sessão e pode ser registrado pelo professor responsável. Não compartilhamos dados com terceiros.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       TELA 3 – NÍVEL
+  ══════════════════════════════════════ -->
+  <section id="nivel" class="tela">
+    <div class="card-nivel">
+      <h2>Escolha a dificuldade<br>que você deseja jogar</h2>
+      <button class="btn-nivel btn-facil"   data-n="facil"  >⭐ Fácil</button>
+      <button class="btn-nivel btn-medio"   data-n="medio"  >⭐⭐ Médio</button>
+      <button class="btn-nivel btn-dificil" data-n="dificil">⭐⭐⭐ Difícil</button>
+      <button class="btn-iniciar" id="btn-iniciar">
+        <span class="play-icon"></span> Iniciar
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       TELA 4 – JOGO
+  ══════════════════════════════════════ -->
+  <section id="jogo" class="tela">
+    <div class="jogo-topo">
+      <span class="jogo-area" id="area"></span>
+      <div class="barra-wrap"><div class="barra-fill" id="prog"></div></div>
+      <span class="jogo-cont" id="cont"></span>
+    </div>
+    <div class="jogo-pergunta" id="enun"></div>
+    <div class="jogo-acoes">
+      <button class="btn-ouvir" id="ouvir" aria-label="Ouvir a pergunta">🔊 Ouvir</button>
+      <button class="btn-desistir" id="desistir">🏳️ Desistir</button>
+    </div>
+    <div class="jogo-opcoes" id="opcoes"></div>
+    <div class="jogo-msg" id="msg" aria-live="polite"></div>
+  </section>
+
+  <!-- Modal de confirmação de desistência (fora da section, overlay global) -->
+  <div id="modal-desistir" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" hidden>
+    <div class="modal-box">
+      <p id="modal-titulo" class="modal-txt">Tem certeza que quer desistir?<br>Seu progresso será perdido.</p>
+      <div class="modal-btns">
+        <button class="modal-btn-sim" id="modal-sim">Sim, desistir</button>
+        <button class="modal-btn-nao" id="modal-nao">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TELA 5 – RESULTADO
+  ══════════════════════════════════════ -->
+  <section id="fim" class="tela">
+    <div class="fim-layout">
+      <div class="fim-robo">
+        <img src="/img/robo-resultado.jpeg" alt="Robô UNIFEBE">
+      </div>
+      <div class="fim-card">
+        <h1>Parabéns!</h1>
+        <p class="fim-sub">Você é um Pequeno Gênio!</p>
+
+        <div class="estrelas" id="estrelas-wrap" aria-label="Pontuação em estrelas"></div>
+
+        <div class="fim-pontos-box">
+          <div class="fim-pontos-label">Pontuação Final</div>
+          <div class="fim-pontos-valor" id="pontos-valor">0<span id="pontos-total">/0 Acertos!</span></div>
+        </div>
+
+        <div class="fim-barra-wrap">
+          <div class="fim-barra-labels">
+            <span class="corretas" id="label-corretas">● 0 Corretas</span>
+            <span class="incorretas" id="label-incorretas">● 0 Incorretas</span>
+          </div>
+          <div class="fim-bolinhas" id="fim-bolinhas"></div>
+        </div>
+
+        <button class="btn-jogar-novo" id="btn-jogar-novo">🔄 Jogar Novamente</button>
+        <button class="btn-voltar-inicio" id="btn-voltar-inicio">🏠 Voltar ao Início</button>
+        <button class="btn-baixar" id="btn-baixar" hidden>💾 Baixar registro (.txt)</button>
+      </div>
+    </div>
+  </section>
+
   </style>
 </head>
