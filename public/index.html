@@ -693,5 +693,250 @@
     </div>
   </section>
 
+  <script src="/questoes.js"></script>
+<script>
+ 
+  const $ = id => document.getElementById(id);
+  const sorteia = a => a[Math.floor(Math.random() * a.length)];
+  const embaralha = a => [...a].map(v => [Math.random(), v]).sort((x,y) => x[0]-y[0]).map(x => x[1]);
+
+  function tela(id) {
+    document.querySelectorAll('.tela').forEach(t => t.classList.toggle('on', t.id === id));
+  }
+
+  function falar(txt) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(
+      txt.replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu, '').replace(/-/g, ' - ')
+    );
+    u.lang = 'pt-BR'; u.rate = .85;
+    speechSynthesis.speak(u);
+  }
+
+  function bip(freqs) {
+    try {
+      const c = new (window.AudioContext || window.webkitAudioContext)();
+      freqs.forEach((f, k) => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.frequency.value = f; o.connect(g); g.connect(c.destination);
+        g.gain.setValueAtTime(.15, c.currentTime + k*.15);
+        g.gain.exponentialRampToValueAtTime(.001, c.currentTime + k*.15 + .14);
+        o.start(c.currentTime + k*.15); o.stop(c.currentTime + k*.15 + .15);
+      });
+    } catch(e) {}
+  }
+
+
+  function svgEstrela(cheia) {
+    const fill   = cheia ? '#F5A623' : 'none';
+    const stroke = cheia ? '#F5A623' : '#ccc';
+    return `<svg viewBox="0 0 51 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M25.5 2 L31.5 18.5 L49 18.5 L35 29 L40 45.5 L25.5 36 L11 45.5 L16 29 L2 18.5 L19.5 18.5 Z"
+        fill="${fill}" stroke="${stroke}" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+
+  const NOMES_NIVEL = { facil: 'Fácil', medio: 'Médio', dificil: 'Difícil' };
+  const ELOGIOS  = ['Parabéns! 🌟','Muito bem! 🎉','Isso aí! 👏','Você arrasou! 🏆','Uhuuu! 🎈'];
+  const TENTE    = ['Quase! Tente de novo 💪','Boa tentativa! 😊','Pode tentar outra vez! 🌈'];
+
+  let nome, nivel, lista, qi, acertos, errouAqui, travado, pendentes = [];
+
+  
+  async function registrar(q, acertou) {
+    const reg = { nome, nivel: NOMES_NIVEL[nivel], area: AREAS[q[0]], habilidade: q[1], pergunta: q[2], acertou };
+    try {
+      const r = await fetch('/api/tentativa', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(reg)
+      });
+      if (!r.ok) throw 0;
+    } catch(e) { pendentes.push(reg); }
+  }
+
+
+  $('btn-comecar').onclick = () => tela('nome-tela');
+
+  $('btn-ir-nivel').onclick = () => {
+    nome = $('nome-input').value.trim();
+    if (!nome) {
+      $('nome-input').focus();
+      $('nome-input').placeholder = 'Escreva seu nome primeiro 😊';
+      return;
+    }
+    tela('nivel');
+  };
+  $('nome-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-ir-nivel').click(); });
+
+  
+  let nivelSel = null;
+  document.querySelectorAll('.btn-nivel').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('.btn-nivel').forEach(x => x.classList.remove('selecionado'));
+      b.classList.add('selecionado');
+      nivelSel = b.dataset.n;
+    };
+  });
+
+  $('btn-iniciar').onclick = () => {
+    if (!nivelSel) {
+      
+      nivelSel = 'facil';
+      document.querySelector('.btn-facil').classList.add('selecionado');
+    }
+    iniciar(nivelSel);
+  };
+
+ 
+  function iniciar(n) {
+    nivel = n; lista = QUESTOES[n]; qi = 0; acertos = 0;
+    tela('jogo'); mostrar();
+  }
+
+  function mostrar() {
+    const q = lista[qi]; errouAqui = false; travado = false;
+    $('area').textContent = AREAS[q[0]];
+    $('cont').textContent = `${qi + 1}/${lista.length}`;
+    $('prog').style.width = (qi / lista.length * 100) + '%';
+    $('enun').textContent = q[2];
+    $('msg').textContent = '';
+
+    const box = $('opcoes'); box.innerHTML = '';
+    embaralha(q[3].map((t, k) => ({ t, ok: k === q[4] }))).forEach(o => {
+      const b = document.createElement('button');
+      b.className = 'op'; b.textContent = o.t;
+      b.onclick = () => responder(b, o.ok, q);
+      box.appendChild(b);
+    });
+    falar(q[2]);
+  }
+
+  function responder(b, ok, q) {
+    if (travado || b.classList.contains('errado')) return;
+    registrar(q, ok);
+    if (ok) {
+      travado = true;
+      b.classList.add('certo');
+      if (!errouAqui) acertos++;
+      $('msg').textContent = sorteia(ELOGIOS);
+      bip([660, 880, 1100]); falar('Muito bem!');
+      setTimeout(() => { qi++; qi < lista.length ? mostrar() : fim(); }, 1600);
+    } else {
+      errouAqui = true;
+      b.classList.add('errado');
+      $('msg').textContent = sorteia(TENTE);
+      bip([330]); falar('Quase! Tente de novo.');
+    }
+  }
+
+  $('ouvir').onclick = () => falar(lista[qi][2]);
+
+  
+  $('desistir').onclick = () => {
+    if (speechSynthesis) speechSynthesis.cancel();
+    $('modal-desistir').hidden = false;
+    $('modal-nao').focus();
+  };
+  $('modal-nao').onclick = () => {
+    $('modal-desistir').hidden = true;
+    falar(lista[qi][2]); 
+  };
+  $('modal-sim').onclick = () => {
+    $('modal-desistir').hidden = true;
+    nivelSel = null;
+    document.querySelectorAll('.btn-nivel').forEach(x => x.classList.remove('selecionado'));
+    $('nome-input').value = '';
+    pendentes = [];
+    tela('inicio');
+  };
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !$('modal-desistir').hidden) {
+      $('modal-desistir').hidden = true;
+      falar(lista[qi][2]);
+    }
+  });
+
+ 
+  function fim() {
+    tela('fim');
+    const total = lista.length;
+    const erros = total - acertos;
+
+    
+    const numEstrelas = Math.round(acertos / total * 3);
+    const wrap = $('estrelas-wrap');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= 3; i++) {
+      const div = document.createElement('div');
+      div.className = 'estrela';
+      div.innerHTML = svgEstrela(i <= numEstrelas);
+      wrap.appendChild(div);
+    }
+
+    // Mensagem e subtítulo variam com o desempenho
+    const msgs = [
+      { titulo: 'Não desista!',      sub: 'Continue praticando! 💪'       },  
+      { titulo: 'Bom esforço!',      sub: 'Você está aprendendo! 😊'       },  
+      { titulo: 'Muito bem!',        sub: 'Você está quase lá! 🌟'         },  
+      { titulo: 'Parabéns!',         sub: 'Você é um Pequeno Gênio! 🏆'   },  
+    ];
+    const m = msgs[numEstrelas];
+    document.querySelector('.fim-card h1').textContent    = m.titulo;
+    document.querySelector('.fim-card .fim-sub').textContent = m.sub;
+
+    $('estrelas-wrap').setAttribute('aria-label', `${numEstrelas} de 3 estrelas`);
+    $('pontos-valor').childNodes[0].textContent = acertos;
+    $('pontos-total').textContent = `/${total} Acertos!`;
+
+    // Labels
+    $('label-corretas').textContent   = `● ${acertos} Corretas`;
+    $('label-incorretas').textContent = `● ${erros} Incorretas`;
+
+
+    const bolinhas = $('fim-bolinhas');
+    bolinhas.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = 'bolinha ' + (i < acertos ? 'ok' : 'err');
+      bolinhas.appendChild(d);
+    }
+
+    bip([523, 659, 784, 1047]);
+    falar(`${m.titulo}, ${nome}! Você terminou com ${acertos} acertos!`);
+
+ 
+    $('btn-baixar').hidden = !pendentes.length;
+  }
+
+  $('btn-jogar-novo').onclick = () => { iniciar(nivel); };
+  $('btn-voltar-inicio').onclick = () => {
+    nivelSel = null;
+    document.querySelectorAll('.btn-nivel').forEach(x => x.classList.remove('selecionado'));
+    $('nome-input').value = '';
+    tela('inicio');
+  };
+
+  
+  $('btn-baixar').onclick = () => {
+    const d = new Date();
+    const txt = 'ID|Nome|Data|Hora|Nivel|Area|Habilidade|Pergunta|Resultado\n'
+      + pendentes.map((r, k) => [
+          k + 1, r.nome,
+          d.toLocaleDateString('pt-BR'),
+          d.toLocaleTimeString('pt-BR'),
+          r.nivel, r.area, r.habilidade, r.pergunta,
+          r.acertou ? 'ACERTO' : 'ERRO'
+        ].join('|')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' }));
+    a.download = `tentativas_${nome}_${d.toLocaleDateString('pt-BR').replace(/\//g,'-')}.txt`;
+    a.click();
+  };
+</script>
+  
   </body>
 </html>
